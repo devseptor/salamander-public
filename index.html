@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jack Salamander — Geschützter Zugang</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style id="vault-gate-style">
+      :root {
+        --bg: #060b08;
+        --amber: #f5b53f;
+        --amber-bright: #ffd36e;
+        --text: #f3f5f1;
+        --muted: rgba(235, 240, 232, 0.65);
+        --border: rgba(255, 255, 255, 0.12);
+      }
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body {
+        width: 100%; height: 100%;
+        background: radial-gradient(circle at 50% 38%, #14261b 0%, #070d09 68%, #040705 100%);
+        color: var(--text);
+        font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+      }
+      .gate-wrap {
+        position: fixed; inset: 0;
+        display: grid; place-items: center;
+        padding: 20px;
+      }
+      .ambient-glow {
+        position: fixed;
+        width: 520px; height: 520px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(245, 181, 63, 0.14) 0%, rgba(56, 138, 86, 0.06) 45%, transparent 72%);
+        filter: blur(28px);
+        pointer-events: none;
+        animation: drift 9s ease-in-out infinite alternate;
+      }
+      @keyframes drift {
+        from { transform: translate(-40px, -25px) scale(0.95); }
+        to { transform: translate(40px, 25px) scale(1.08); }
+      }
+      .gate-card {
+        position: relative;
+        width: 100%; max-width: 410px;
+        padding: 36px 32px 32px;
+        border-radius: 24px;
+        background: rgba(11, 18, 14, 0.72);
+        backdrop-filter: blur(22px) saturate(140%);
+        -webkit-backdrop-filter: blur(22px) saturate(140%);
+        border: 1px solid var(--border);
+        box-shadow: 0 28px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        text-align: center;
+      }
+      .gate-card.shake {
+        animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+      }
+      @keyframes shake {
+        10%, 90% { transform: translateX(-3px); }
+        20%, 80% { transform: translateX(5px); }
+        30%, 50%, 70% { transform: translateX(-7px); }
+        40%, 60% { transform: translateX(7px); }
+      }
+      .lock-emblem {
+        width: 60px; height: 60px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, rgba(255, 211, 110, 0.28), rgba(245, 181, 63, 0.08));
+        border: 1px solid rgba(245, 181, 63, 0.42);
+        display: grid; place-items: center;
+        color: var(--amber-bright);
+        box-shadow: 0 0 28px rgba(245, 181, 63, 0.22);
+      }
+      .badge {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 0.68rem; font-weight: 700;
+        letter-spacing: 0.16em; text-transform: uppercase;
+        color: var(--amber);
+        margin-bottom: 6px;
+      }
+      .badge-dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--amber); box-shadow: 0 0 8px var(--amber);
+      }
+      h1 {
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 1.7rem; font-weight: 700;
+        letter-spacing: -0.01em; margin-bottom: 8px;
+      }
+      .subtitle {
+        font-size: 0.88rem; color: var(--muted);
+        line-height: 1.5; margin-bottom: 24px;
+      }
+      .input-wrap {
+        position: relative;
+        margin-bottom: 14px;
+      }
+      input[type="password"], input[type="text"] {
+        width: 100%;
+        padding: 13px 44px 13px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font-family: inherit; font-size: 0.96rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      }
+      input:focus {
+        border-color: rgba(245, 181, 63, 0.75);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(245, 181, 63, 0.16);
+      }
+      .eye-btn {
+        position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+        background: none; border: none; color: var(--muted);
+        cursor: pointer; padding: 6px; display: grid; place-items: center;
+      }
+      .eye-btn:hover { color: var(--text); }
+      .remember-row {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 0.8rem; color: var(--muted);
+        margin-bottom: 18px; text-align: left; cursor: pointer;
+        user-select: none;
+      }
+      .remember-row input { accent-color: var(--amber); width: 15px; height: 15px; }
+      .unlock-btn {
+        width: 100%;
+        padding: 13px 18px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #e5991c, var(--amber), var(--amber-bright));
+        color: #161004;
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 0.95rem; font-weight: 700; letter-spacing: 0.02em;
+        cursor: pointer;
+        box-shadow: 0 10px 26px rgba(245, 181, 63, 0.3);
+        transition: transform 0.16s ease, filter 0.18s ease, opacity 0.18s ease;
+      }
+      .unlock-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
+      .unlock-btn:disabled { opacity: 0.6; cursor: wait; }
+      .status {
+        min-height: 22px;
+        margin-top: 14px;
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .status.error { color: #ff7b7b; }
+      .crypto-note {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.72rem;
+        color: rgba(235, 240, 232, 0.42);
+        letter-spacing: 0.03em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gate-wrap">
+      <div class="ambient-glow" aria-hidden="true"></div>
+      <form id="vault-form" class="gate-card" autocomplete="off">
+        <div class="lock-emblem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="26" height="26">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <div class="badge"><span class="badge-dot"></span><span>AES-256-GCM TRESOR</span></div>
+        <h1>Jack Salamander</h1>
+        <p class="subtitle">
+          Dieses interaktive 3D-Modell und alle Blender-Exporte sind passwortgeschützt verschlüsselt.
+        </p>
+
+        <div class="input-wrap">
+          <input
+            id="vault-password"
+            type="password"
+            placeholder="Passwort eingeben…"
+            required
+            autofocus
+          />
+          <button type="button" id="toggle-vis" class="eye-btn" aria-label="Passwort anzeigen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+
+        <label class="remember-row">
+          <input id="vault-remember" type="checkbox" checked />
+          <span>In diesem Browser-Tab entsperrt lassen</span>
+        </label>
+
+        <button id="vault-submit" type="submit" class="unlock-btn">
+          Habitat entsperren
+        </button>
+
+        <div id="vault-status" class="status" role="status" aria-live="polite"></div>
+
+        <div class="crypto-note">
+          Ende-zu-Ende-Entschlüsselung lokal im Browser · PBKDF2-SHA256 &amp; AES-256-GCM
+        </div>
+      </form>
+    </div>
+
+    <script type="module">
+      const SESSION_KEY = 'jack_salamander_vault_pw_v1';
+      const form = document.getElementById('vault-form');
+      const pwInput = document.getElementById('vault-password');
+      const rememberBox = document.getElementById('vault-remember');
+      const submitBtn = document.getElementById('vault-submit');
+      const statusEl = document.getElementById('vault-status');
+      const toggleVis = document.getElementById('toggle-vis');
+
+      toggleVis.addEventListener('click', () => {
+        pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
+        pwInput.focus();
+      });
+
+      function base64ToBytes(b64) {
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return bytes;
+      }
+
+      async function deriveAesKey(password, meta) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+          'raw',
+          enc.encode(password),
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+        return crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: base64ToBytes(meta.salt),
+            iterations: meta.iterations,
+            hash: 'SHA-256',
+          },
+          keyMaterial,
+          { name: 'AES-GCM', length: 256 },
+          false,
+          ['decrypt']
+        );
+      }
+
+      async function fetchWithProgress(url, onProgress) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + url);
+        const total = Number(res.headers.get('content-length') || 0);
+        if (!res.body || !total || !onProgress) {
+          const buf = await res.arrayBuffer();
+          if (onProgress) onProgress(0.9);
+          return buf;
+        }
+        const reader = res.body.getReader();
+        const chunks = [];
+        let loaded = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          loaded += value.byteLength;
+          onProgress(Math.min(0.9, (loaded / total) * 0.9));
+        }
+        const merged = new Uint8Array(loaded);
+        let offset = 0;
+        for (const c of chunks) {
+          merged.set(c, offset);
+          offset += c.byteLength;
+        }
+        return merged.buffer;
+      }
+
+      async function decryptEncBuffer(encBuffer, aesKey) {
+        const bytes = new Uint8Array(encBuffer);
+        const iv = bytes.subarray(0, 12);
+        const ciphertextAndTag = bytes.subarray(12);
+        return crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv, tagLength: 128 },
+          aesKey,
+          ciphertextAndTag
+        );
+      }
+
+      async function attemptUnlock(password, saveToSession) {
+        if (!window.crypto || !window.crypto.subtle) {
+          statusEl.textContent = 'Web Crypto API erfordert HTTPS oder localhost.';
+          statusEl.className = 'status error';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        statusEl.className = 'status';
+        statusEl.textContent = 'Prüfe Schlüssel & entschlüssle Tresor…';
+
+        try {
+          const [metaRes, appEncBuf] = await Promise.all([
+            fetch('./vault/meta.json'),
+            fetchWithProgress('./vault/app.enc'),
+          ]);
+          if (!metaRes.ok) throw new Error('meta.json nicht gefunden');
+          const meta = await metaRes.json();
+
+          const aesKey = await deriveAesKey(password, meta);
+          const plainBuf = await decryptEncBuffer(appEncBuf, aesKey);
+          const bundle = JSON.parse(new TextDecoder().decode(plainBuf));
+
+          if (saveToSession) {
+            try { sessionStorage.setItem(SESSION_KEY, password); } catch {}
+          } else {
+            try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+          }
+
+          // Expose in-memory decryptor for 3D models & textures
+          window.__JACK_VAULT__ = {
+            async decryptToObjectUrl(relPath, mimeType, onProgress) {
+              const encUrl = './vault/' + relPath.replace(/^\/+/, '') + '.enc';
+              const encBuf = await fetchWithProgress(encUrl, onProgress);
+              const plain = await decryptEncBuffer(encBuf, aesKey);
+              if (onProgress) onProgress(1);
+              return URL.createObjectURL(new Blob([plain], { type: mimeType }));
+            },
+            lock() {
+              try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+              location.reload();
+            },
+          };
+
+          // Swap DOM from Vault Gate to Jack Salamander 3D App
+          document.title = 'Jack Salamander — Interaktives 3D-Habitat';
+          const gateStyle = document.getElementById('vault-gate-style');
+          if (gateStyle) gateStyle.remove();
+
+          const appStyle = document.createElement('style');
+          appStyle.textContent = bundle.css;
+          document.head.appendChild(appStyle);
+
+          document.body.innerHTML = bundle.html;
+
+          const jsBlobUrl = URL.createObjectURL(
+            new Blob([bundle.js], { type: 'text/javascript' })
+          );
+          const script = document.createElement('script');
+          script.type = 'module';
+          script.src = jsBlobUrl;
+          document.body.appendChild(script);
+        } catch (err) {
+          console.warn('Entschlüsselung fehlgeschlagen:', err);
+          try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+          statusEl.textContent = 'Falsches Passwort — bitte erneut versuchen.';
+          statusEl.className = 'status error';
+          form.classList.remove('shake');
+          void form.offsetWidth;
+          form.classList.add('shake');
+          pwInput.select();
+          submitBtn.disabled = false;
+        }
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        attemptUnlock(pwInput.value, rememberBox.checked);
+      });
+
+      // Auto-unlock if already unlocked in this tab session
+      try {
+        const saved = sessionStorage.getItem(SESSION_KEY);
+        if (saved) {
+          pwInput.value = saved;
+          attemptUnlock(saved, true);
+        }
+      } catch {}
+    </script>
+  </body>
+</html>
